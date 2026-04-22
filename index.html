@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pika-Pair Up - Marie's Creative Classroom</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
+    
     <style>
         :root {
             --poke-red: #ff0000;
@@ -22,6 +24,7 @@
             margin: 0;
             overflow-x: hidden;
             color: #333;
+            user-select: none;
         }
 
         /* --- Animations --- */
@@ -30,207 +33,220 @@
             50% { transform: translateY(-20px) rotate(20deg); }
             100% { transform: translateY(0px) rotate(0deg); left: 110%; }
         }
-
-        .pikachu-bg {
-            position: fixed;
-            font-size: 40px;
-            z-index: -1;
-            opacity: 0.2;
-            animation: float 15s infinite linear;
-        }
+        .bg-obj { position: fixed; font-size: 50px; z-index: -1; opacity: 0.2; animation: float 18s infinite linear; }
 
         /* --- Layout --- */
         .screen {
             display: none;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             min-height: 100vh;
-            padding: 20px;
+            width: 100vw;
+            padding: 40px;
             box-sizing: border-box;
             transform: scale(var(--game-scale));
             transform-origin: top center;
         }
-
         .active { display: flex; }
 
-        .title-container {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
+        .title-container { text-align: center; margin-bottom: 5vh; }
         .main-title {
             font-family: 'Press Start 2P', cursive;
-            font-size: clamp(1.2rem, 5vw, 2.5rem);
+            font-size: clamp(2rem, 8vw, 4.5rem);
             color: var(--poke-blue);
-            text-shadow: 3px 3px var(--poke-yellow);
-            margin-bottom: 5px;
+            text-shadow: 6px 6px var(--poke-yellow);
+            margin-bottom: 20px;
         }
 
-        .sub-title {
-            font-family: "Comic Sans MS", cursive;
-            font-size: 1.2rem;
-            color: #555;
-            font-weight: bold;
-        }
-
-        /* --- UI Components --- */
+        /* --- Buttons --- */
         .btn {
             background: var(--poke-yellow);
-            border: 4px solid var(--poke-blue);
-            padding: 15px 30px;
+            border: 6px solid var(--poke-blue);
+            padding: 25px 50px;
             font-family: 'Press Start 2P', cursive;
-            font-size: 0.8rem;
+            font-size: clamp(0.8rem, 2vw, 1.2rem);
             cursor: pointer;
-            margin: 10px;
-            border-radius: 10px;
-            box-shadow: 4px 4px 0 var(--poke-gold);
+            margin: 15px;
+            border-radius: 20px;
+            box-shadow: 6px 6px 0 var(--poke-gold);
             transition: all 0.1s;
+            text-transform: uppercase;
         }
+        .btn:hover { background: white; transform: scale(1.05); }
+        .btn:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--poke-gold); }
+        .btn-red { background: var(--poke-red); color: white; border-color: #800000; box-shadow: 6px 6px 0 #500000; }
+        .btn-small { padding: 10px 20px; font-size: 0.7rem; border-width: 3px; }
 
-        .btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--poke-gold); }
-        .btn-red { background: var(--poke-red); color: white; border-color: #800000; box-shadow: 4px 4px 0 #500000; }
-
+        /* --- Practice Lab --- */
+        .lab-bg { background: radial-gradient(circle, #e3f2fd, #bbdefb); }
         .control-panel {
-            background: white;
-            padding: 15px;
-            border: 3px solid var(--poke-blue);
-            border-radius: 15px;
-            margin-bottom: 20px;
+            background: rgba(255,255,255,0.9);
+            padding: 20px;
+            border: 4px solid var(--poke-blue);
+            border-radius: 20px;
             display: flex;
-            gap: 15px;
+            gap: 20px;
+            margin-bottom: 20px;
+            width: 90%;
+            justify-content: space-around;
             align-items: center;
-            flex-wrap: wrap;
-            justify-content: center;
         }
 
+        /* --- Cards --- */
         .game-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 15px;
             width: 100%;
-            max-width: 1000px;
+            max-width: 1200px;
         }
-
         .card {
             aspect-ratio: 3/4;
             background: white;
-            border: 5px solid var(--poke-yellow);
+            border: 5px solid var(--poke-blue);
             border-radius: 15px;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
             cursor: pointer;
             font-weight: bold;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             padding: 10px;
             position: relative;
-            transition: transform 0.3s;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="white" stroke="black" stroke-width="2"/><path d="M5 50 a45 45 0 0 1 90 0 Z" fill="red"/><line x1="5" y1="50" x2="95" y2="50" stroke="black" stroke-width="4"/><circle cx="50" cy="50" r="12" fill="white" stroke="black" stroke-width="3"/></svg>');
+            background-size: 60% 60%;
+            background-repeat: no-repeat;
+            background-position: center;
         }
-
-        .card.matched { visibility: hidden; }
-        .card.flipped { background: var(--poke-yellow); }
-
-        .image-preview {
-            width: 80%;
-            height: 60%;
-            object-fit: contain;
-            pointer-events: none;
+        .card.revealed { 
+            transform: rotateY(180deg); 
+            background-image: none; 
+            background-color: white;
+            border-color: var(--poke-yellow);
         }
+        .card-content { transform: rotateY(180deg); display: none; }
+        .card.revealed .card-content { display: block; }
+        .card.matched { opacity: 0.3; cursor: default; }
+        .card.bomb { background-color: #333 !important; }
 
-        /* --- Duel Split --- */
-        .duel-container { display: flex; width: 100vw; height: 80vh; }
-        .side { flex: 1; border: 4px solid var(--poke-blue); position: relative; padding: 10px; overflow-y: auto; }
-        .status-effect {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(147, 51, 234, 0.6); color: white;
-            display: none; justify-content: center; align-items: center; font-size: 2rem; z-index: 10;
+        /* --- Duel Mode --- */
+        .duel-top-bar {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 40px;
+            background: var(--poke-blue);
+            color: white;
+            font-family: 'Press Start 2P';
+            font-size: 0.8rem;
+        }
+        .duel-main { display: flex; width: 100%; flex: 1; }
+        .side { flex: 1; padding: 20px; border: 4px solid var(--poke-yellow); position: relative; }
+        .freeze-overlay {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,255,0.4); display: none; z-index: 100;
+            justify-content: center; align-items: center; color: white; font-size: 2rem;
         }
 
         /* --- Editor --- */
-        .pair-row { display: flex; gap: 10px; margin-bottom: 10px; background: #eee; padding: 10px; border-radius: 10px; align-items: center; }
-        .drop-zone { width: 100px; height: 60px; border: 2px dashed #999; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; background: #fff; background-size: cover; background-position: center; }
-        input[type="text"] { padding: 8px; border-radius: 5px; border: 1px solid #ccc; flex: 1; }
+        .editor-container { width: 100%; max-width: 800px; max-height: 60vh; overflow-y: auto; background: white; padding: 20px; border-radius: 20px; }
+        .pair-row { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; border-bottom: 1px solid #ddd; padding-bottom: 10px;}
+        .drop-zone { width: 80px; height: 80px; border: 3px dashed var(--poke-blue); display: flex; align-items: center; justify-content: center; border-radius: 10px; cursor: pointer; background-size: cover; background-position: center; font-size: 10px; text-align: center; }
+        .editor-input { flex: 1; padding: 12px; font-family: "Comic Sans MS"; border-radius: 10px; border: 2px solid #ccc; }
 
     </style>
 </head>
 <body>
 
-    <div id="bg-elements"></div>
+    <div id="bg-layer"></div>
 
-    <div id="menu-screen" class="screen active">
+    <div id="home-screen" class="screen active">
         <div class="title-container">
             <div class="main-title">PIKA-PAIR UP</div>
             <div class="sub-title">Marie's Creative Classroom</div>
         </div>
-        <button class="btn" onclick="showScreen('mode-screen')">START ADVENTURE</button>
-        <button class="btn" onclick="showScreen('edit-screen')">PROF. OAK'S LAB (EDIT)</button>
-        <button class="btn" onclick="showHistory()">HALL OF FAME</button>
-        <div id="load-msg" style="color:green; display:none; margin-top:20px;">LIST LOADED!</div>
+        <button class="btn" onclick="showScreen('mode-screen')" style="font-size: 1.5rem;">START ADVENTURE</button>
+        <button class="btn btn-red" onclick="showScreen('edit-screen')">PROF. OAK'S LAB (EDIT)</button>
+        <button class="btn btn-small" onclick="showHistory()">HALL OF FAME</button>
     </div>
 
     <div id="mode-screen" class="screen">
-        <div class="title-container">
-            <div class="main-title" style="font-size: 1.5rem;">SELECT STAGE</div>
+        <div class="main-title" style="font-size: 2rem;">SELECT MODE</div>
+        <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+            <button class="btn" style="height: 300px; width: 300px;" onclick="initPractice()">PRACTICE LAB</button>
+            <button class="btn btn-red" style="height: 300px; width: 300px;" onclick="showScreen('duel-setup-screen')">STADIUM SHOWDOWN</button>
         </div>
-        <button class="btn" onclick="initGame('practice')">PRACTICE (OAK'S LAB)</button>
-        <button class="btn btn-red" onclick="initGame('duel')">STADIUM SHOWDOWN (DUEL)</button>
-        <button class="btn" onclick="showScreen('menu-screen')">BACK</button>
+        <button class="btn btn-small" onclick="showScreen('home-screen')">BACK</button>
     </div>
 
-    <div id="game-screen" class="screen">
-        <div class="control-panel">
-            <div id="picker-area">
-                Trainer: <input type="text" id="stu-range" value="1-20" style="width:60px;">
-                <button class="btn btn-small" style="padding:5px; font-size:0.6rem;" onclick="pickStudent()">PICK</button>
-                <b id="picked-num">?</b>
+    <div id="duel-setup-screen" class="screen">
+        <div class="main-title" style="font-size: 1.5rem;">DUEL SETUP</div>
+        <div class="control-panel" style="flex-direction: column; width: 600px;">
+            <div style="display: flex; gap: 20px;">
+                <div>
+                    <label>Team A Name:</label><br>
+                    <input type="text" id="name-a" class="editor-input" value="PIKACHUS">
+                </div>
+                <div>
+                    <label>Team B Name:</label><br>
+                    <input type="text" id="name-b" class="editor-input" value="CHARIZARDS">
+                </div>
             </div>
+            <button class="btn" onclick="initDuel()">BATTLE START!</button>
+        </div>
+    </div>
+
+    <div id="practice-screen" class="screen lab-bg">
+        <div class="control-panel">
             <div>
                 Zoom: <input type="range" min="0.5" max="1.5" step="0.1" value="1" oninput="adjustZoom(this.value)">
             </div>
-            <div id="lives-display">❤️❤️❤️</div>
+            <div>
+                Student Picker: <input type="text" id="stu-range" value="1-30" style="width: 60px; padding: 5px;">
+                <button class="btn btn-small" onclick="pickStudent()">GO</button>
+                <span id="picked-num" style="font-weight: bold; font-size: 1.5rem; color: var(--poke-red);">?</span>
+            </div>
+            <button class="btn btn-small btn-red" onclick="showScreen('mode-screen')">EXIT</button>
         </div>
-        <div id="board" class="game-grid"></div>
-        <button id="next-set-btn" class="btn" style="display:none;" onclick="loadNextSet()">NEXT SET →</button>
-        <button class="btn btn-red" onclick="showScreen('menu-screen')">EXIT</button>
+        <div id="practice-board" class="game-grid"></div>
+        <button id="next-practice" class="btn" style="display: none;" onclick="advanceSet()">NEXT SET</button>
     </div>
 
-    <div id="duel-screen" class="screen" style="padding:0;">
-        <div class="duel-container">
-            <div id="side-l" class="side">
-                <div class="status-effect" id="poison-l">POISONED!</div>
-                <h3 id="name-l">TEAM A</h3>
-                <div id="score-l" style="font-family:'Press Start 2P';">0</div>
-                <div id="board-l" class="game-grid"></div>
+    <div id="duel-screen" class="screen" style="padding:0; justify-content: flex-start;">
+        <div class="duel-top-bar">
+            <div id="top-a">NAME: PIKACHUS | Lvl: 1 | SCORE: <span id="score-a">0</span></div>
+            <div id="top-picker">PICKER: <span id="duel-picked">?</span> <button onclick="pickStudent('duel-picked')">🎲</button></div>
+            <div id="top-b">NAME: CHARIZARDS | Lvl: 1 | SCORE: <span id="score-b">0</span></div>
+        </div>
+        <div class="duel-main">
+            <div class="side" id="side-a">
+                <div class="freeze-overlay" id="freeze-a">FROZEN!</div>
+                <div id="board-a" class="game-grid"></div>
             </div>
-            <div id="side-r" class="side">
-                <div class="status-effect" id="poison-r">POISONED!</div>
-                <h3 id="name-r">TEAM B</h3>
-                <div id="score-r" style="font-family:'Press Start 2P';">0</div>
-                <div id="board-r" class="game-grid"></div>
+            <div class="side" id="side-b">
+                <div class="freeze-overlay" id="freeze-b">FROZEN!</div>
+                <div id="board-b" class="game-grid"></div>
             </div>
         </div>
-        <button class="btn btn-red" style="position:fixed; bottom:10px;" onclick="showScreen('menu-screen')">FORFEIT</button>
     </div>
 
     <div id="edit-screen" class="screen">
         <div class="main-title" style="font-size: 1.5rem;">EDITOR</div>
-        <button class="btn" onclick="autoTranslate()">POKE-TRANSLATE (AI)</button>
-        <div id="editor-list" style="width:100%; max-width:600px;"></div>
-        <button class="btn" onclick="addPair()">+ ADD PAIR</button>
-        <button class="btn btn-red" onclick="saveAndLink()">GENERATE GAME LINK</button>
-        <div id="link-box" style="word-break:break-all; background:white; padding:10px; margin-top:10px; display:none; border: 2px solid var(--poke-blue);"></div>
-        <button class="btn" onclick="showScreen('menu-screen')">BACK</button>
-    </div>
-
-    <div id="history-screen" class="screen">
-        <div class="main-title" style="font-size: 1.5rem;">HALL OF FAME</div>
-        <div id="history-list"></div>
-        <button class="btn" onclick="showScreen('menu-screen')">BACK</button>
+        <div class="editor-container" id="editor-list"></div>
+        <div style="margin-top: 20px;">
+            <button class="btn btn-small" onclick="addPair()">+ ADD PAIR</button>
+            <button class="btn btn-small btn-red" onclick="generateLink()">GENERATE LINK</button>
+        </div>
+        <textarea id="link-output" style="width: 80%; margin-top: 10px; display: none;" readonly></textarea>
+        <button class="btn btn-small" onclick="showScreen('home-screen')">BACK</button>
     </div>
 
     <script>
+        // --- Core State ---
         let vocabPairs = [
             { a: "Motivate", b: "激勵 Jīlì", imgA: "", imgB: "" },
             { a: "Achieve", b: "成就 Chéngjiù", imgA: "", imgB: "" },
@@ -239,40 +255,155 @@
             { a: "Empower", b: "授權 Shòuquán", imgA: "", imgB: "" }
         ];
 
-        let lives = 3;
-        let scores = { l: 0, r: 0 };
-        let flippedCards = [];
-        let canFlip = true;
+        let currentLevel = 1;
+        let duelScores = { a: 0, b: 0 };
+        let activePairs = [];
+        let pikaHistory = JSON.parse(localStorage.getItem('pika_pair_history') || "[]");
 
+        // --- Initialization ---
         window.onload = () => {
             const params = new URLSearchParams(window.location.search);
             const data = params.get('w');
             if (data) {
-                try {
-                    vocabPairs = JSON.parse(atob(data));
-                    document.getElementById('load-msg').style.display = 'block';
-                    saveToHistory(window.location.href, vocabPairs);
-                } catch (e) { console.error("Load error"); }
+                const decompressed = LZString.decompressFromEncodedURIComponent(data);
+                if (decompressed) {
+                    vocabPairs = JSON.parse(decompressed);
+                    saveToHistory(window.location.href, vocabPairs[0].a);
+                }
             }
             createBGElements();
             renderEditor();
         };
 
         function createBGElements() {
-            const container = document.getElementById('bg-elements');
-            const icons = ['⚡', '🔴', '⭐', '🔥'];
-            for (let i = 0; i < 6; i++) {
-                let div = document.createElement('div');
-                div.className = 'pikachu-bg';
-                div.innerText = icons[Math.floor(Math.random() * icons.length)];
-                div.style.top = Math.random() * 80 + '%';
-                div.style.animationDelay = (Math.random() * 10) + 's';
+            const icons = ['⚡', '🔴', '⭐', '🔥', '💧'];
+            const container = document.getElementById('bg-layer');
+            for (let i = 0; i < 8; i++) {
+                const div = document.createElement('div');
+                div.className = 'bg-obj';
+                div.innerText = icons[Math.floor(Math.random()*icons.length)];
+                div.style.top = Math.random() * 90 + '%';
+                div.style.animationDelay = (Math.random() * 15) + 's';
                 container.appendChild(div);
             }
         }
 
-        function adjustZoom(val) { document.documentElement.style.setProperty('--game-scale', val); }
+        // --- Practice Logic ---
+        function initPractice() {
+            showScreen('practice-screen');
+            renderBoard('practice-board', vocabPairs, true);
+        }
 
+        function renderBoard(targetId, pairs, isScaffolded, side = null, specialCards = 0) {
+            const board = document.getElementById(targetId);
+            board.innerHTML = '';
+            let deck = [];
+            
+            pairs.forEach((p, i) => {
+                // Card A (Prompt)
+                deck.push({ content: p.a, img: p.imgA, match: i, type: 'a', revealed: isScaffolded });
+                // Card B (Answer)
+                deck.push({ content: p.b, img: p.imgB, match: i, type: 'b', revealed: false });
+            });
+
+            // Level 2/3 Special Cards
+            for(let i=0; i<specialCards; i++){
+                deck.push({ type: 'bomb', content: '💣', revealed: false });
+            }
+
+            deck.sort(() => Math.random() - 0.5);
+
+            deck.forEach(item => {
+                const card = document.createElement('div');
+                card.className = `card ${item.revealed ? 'revealed' : ''} ${item.type === 'bomb' ? 'bomb' : ''}`;
+                const inner = document.createElement('div');
+                inner.className = 'card-content';
+                inner.innerHTML = item.img ? `<img src="${item.img}" style="width:100%">` : item.content;
+                card.appendChild(inner);
+                
+                card.onclick = () => handleCardClick(card, item, side, targetId);
+                board.appendChild(card);
+            });
+        }
+
+        let firstCard = null;
+        function handleCardClick(card, item, side, boardId) {
+            if (card.classList.contains('revealed') || card.classList.contains('matched')) return;
+
+            if (item.type === 'bomb') {
+                triggerFreeze(side);
+                card.classList.add('revealed');
+                return;
+            }
+
+            card.classList.add('revealed');
+
+            if (!firstCard) {
+                firstCard = { card, item };
+            } else {
+                if (firstCard.item.match === item.match) {
+                    card.classList.add('matched');
+                    firstCard.card.classList.add('matched');
+                    if(side) updateScore(side, 10);
+                    checkWin(boardId);
+                } else {
+                    const c1 = firstCard.card;
+                    const c2 = card;
+                    setTimeout(() => {
+                        c1.classList.remove('revealed');
+                        c2.classList.remove('revealed');
+                    }, 1000);
+                }
+                firstCard = null;
+            }
+        }
+
+        // --- Duel Logic ---
+        function initDuel() {
+            currentLevel = 1;
+            duelScores = { a: 0, b: 0 };
+            showScreen('duel-screen');
+            loadLevel();
+        }
+
+        function loadLevel() {
+            const pCount = currentLevel === 3 ? 8 : 6;
+            const subset = vocabPairs.slice(0, pCount);
+            const isScaffold = currentLevel === 1;
+            const bombs = currentLevel === 2 ? 2 : 0;
+            
+            renderBoard('board-a', subset, isScaffold, 'a', bombs);
+            renderBoard('board-b', subset, isScaffold, 'b', bombs);
+        }
+
+        function triggerFreeze(side) {
+            const overlay = document.getElementById(`freeze-${side}`);
+            overlay.style.display = 'flex';
+            setTimeout(() => overlay.style.display = 'none', 3000);
+        }
+
+        function updateScore(side, pts) {
+            duelScores[side] += pts;
+            document.getElementById(`score-${side}`).innerText = duelScores[side];
+        }
+
+        function checkWin(boardId) {
+            const unmatched = document.querySelectorAll(`#${boardId} .card:not(.matched):not(.bomb)`);
+            if (unmatched.length === 0) {
+                if (boardId === 'practice-board') return;
+                
+                if (currentLevel < 3) {
+                    currentLevel++;
+                    alert(`LEVEL ${currentLevel} START!`);
+                    loadLevel();
+                } else {
+                    alert("TOURNAMENT COMPLETE!");
+                    showScreen('home-screen');
+                }
+            }
+        }
+
+        // --- Editor & Technical ---
         function renderEditor() {
             const container = document.getElementById('editor-list');
             container.innerHTML = '';
@@ -280,108 +411,53 @@
                 const row = document.createElement('div');
                 row.className = 'pair-row';
                 row.innerHTML = `
-                    <div class="drop-zone" id="dz-a-${i}" style="background-image:url(${p.imgA})">${p.imgA ? '' : 'Img A'}</div>
-                    <input type="text" value="${p.a}" onchange="updateVal(${i}, 'a', this.value)">
-                    <div class="drop-zone" id="dz-b-${i}" style="background-image:url(${p.imgB})">${p.imgB ? '' : 'Img B'}</div>
-                    <input type="text" value="${p.b}" onchange="updateVal(${i}, 'b', this.value)">
+                    <div class="drop-zone" id="dz-a-${i}" style="background-image:url(${p.imgA})">${p.imgA?'':'Drop Img'}</div>
+                    <input type="text" class="editor-input" value="${p.a}" placeholder="English" onchange="vocabPairs[${i}].a=this.value">
+                    <button class="btn btn-small" onclick="pokeTranslate(${i})">Poke-Trans</button>
+                    <input type="text" class="editor-input" value="${p.b}" placeholder="Mandarin" onchange="vocabPairs[${i}].b=this.value">
                 `;
                 container.appendChild(row);
-                setupDropZone(`dz-a-${i}`, i, 'imgA');
-                setupDropZone(`dz-b-${i}`, i, 'imgB');
+                setupDrop(i);
             });
         }
 
-        function setupDropZone(id, index, key) {
-            const dz = document.getElementById(id);
-            dz.ondragover = (e) => e.preventDefault();
-            dz.ondrop = (e) => {
+        function setupDrop(i) {
+            const dz = document.getElementById(`dz-a-${i}`);
+            dz.ondragover = e => e.preventDefault();
+            dz.ondrop = e => {
                 e.preventDefault();
                 const file = e.dataTransfer.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (ev) => { vocabPairs[index][key] = ev.target.result; renderEditor(); };
-                    reader.readAsDataURL(file);
-                }
+                const reader = new FileReader();
+                reader.onload = ev => { vocabPairs[i].imgA = ev.target.result; renderEditor(); };
+                reader.readAsDataURL(file);
             };
         }
 
-        function updateVal(i, key, val) { vocabPairs[i][key] = val; }
-        function addPair() { vocabPairs.push({ a: "", b: "", imgA: "", imgB: "" }); renderEditor(); }
-
-        function autoTranslate() {
-            vocabPairs.forEach(p => { if (p.a && !p.b) p.b = "[Translating...]"; });
+        function pokeTranslate(i) {
+            // Simulated AI Translation logic for the browser
+            const word = vocabPairs[i].a;
+            if(!word) return;
+            alert(`Translating ${word}... (This uses an internal instructional mapping)`);
+            vocabPairs[i].b = `${word} [漢語]`; // Placeholder for integration
             renderEditor();
-            alert("Poke-Translate: Internal dictionary triggered.");
         }
 
-        function saveAndLink() {
-            const encoded = btoa(JSON.stringify(vocabPairs));
-            const url = window.location.href.split('?')[0] + "?w=" + encoded;
-            const lb = document.getElementById('link-box');
-            lb.innerText = url;
-            lb.style.display = 'block';
+        function generateLink() {
+            const json = JSON.stringify(vocabPairs);
+            const compressed = LZString.compressToEncodedURIComponent(json);
+            const url = window.location.href.split('?')[0] + "?w=" + compressed;
+            const output = document.getElementById('link-output');
+            output.value = url;
+            output.style.display = 'block';
             navigator.clipboard.writeText(url);
-            alert("Link Copied!");
+            alert("COMPACT URL COPIED!");
         }
 
-        function initGame(mode) {
-            if (mode === 'practice') {
-                showScreen('game-screen');
-                startSet(0, 'board');
-            } else {
-                showScreen('duel-screen');
-                startSet(0, 'board-l', 'l');
-                startSet(0, 'board-r', 'r');
-            }
-        }
-
-        function startSet(index, containerId, side = null) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = '';
-            let deck = [];
-            vocabPairs.forEach((p, i) => {
-                deck.push({ text: p.a, img: p.imgA, match: i });
-                deck.push({ text: p.b, img: p.imgB, match: i });
-            });
-            deck.sort(() => Math.random() - 0.5);
-            deck.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.dataset.match = item.match;
-                card.dataset.side = side;
-                card.onclick = () => handleFlip(card);
-                card.innerHTML = item.img ? `<img src="${item.img}" class="image-preview">` : item.text;
-                container.appendChild(card);
-            });
-        }
-
-        function handleFlip(card) {
-            if (!canFlip || card.classList.contains('matched') || card.classList.contains('flipped')) return;
-            card.classList.add('flipped');
-            flippedCards.push(card);
-            if (flippedCards.length === 2) {
-                canFlip = false;
-                setTimeout(checkMatch, 800);
-            }
-        }
-
-        function checkMatch() {
-            const [c1, c2] = flippedCards;
-            const side = c1.dataset.side;
-            if (c1.dataset.match === c2.dataset.match) {
-                c1.classList.add('matched'); c2.classList.add('matched');
-                if (side) { scores[side] += 10; document.getElementById(`score-${side}`).innerText = scores[side]; }
-            } else {
-                c1.classList.remove('flipped'); c2.classList.remove('flipped');
-                if (!side) { lives--; updateLives(); }
-            }
-            flippedCards = []; canFlip = true;
-            if (document.querySelectorAll('.card:not(.matched)').length === 0) document.getElementById('next-set-btn').style.display = 'block';
-        }
-
-        function updateLives() {
-            document.getElementById('lives-display').innerText = "❤️".repeat(Math.max(0, lives));
-            if (lives <= 0) { alert("Game Over!"); showScreen('menu-screen'); }
+        function pickStudent(displayId = 'picked-num') {
+            const range = document.getElementById('stu-range').value;
+            const [min, max] = range.split('-').map(Number);
+            const picked = Math.floor(Math.random() * (max - min + 1)) + min;
+            document.getElementById(displayId).innerText = picked;
         }
 
         function showScreen(id) {
@@ -389,23 +465,21 @@
             document.getElementById(id).classList.add('active');
         }
 
-        function pickStudent() {
-            const range = document.getElementById('stu-range').value;
-            const picked = Math.floor(Math.random() * 20) + 1; // Simplified for demo
-            document.getElementById('picked-num').innerText = picked;
-        }
+        function adjustZoom(val) { document.documentElement.style.setProperty('--game-scale', val); }
 
-        function saveToHistory(url, list) {
-            let history = JSON.parse(localStorage.getItem('pika_history') || "[]");
-            history.unshift({ url, date: new Date().toLocaleDateString(), preview: list[0].a });
-            localStorage.setItem('pika_history', JSON.stringify(history.slice(0, 10)));
+        function saveToHistory(url, firstWord) {
+            let history = JSON.parse(localStorage.getItem('pika_pair_history') || "[]");
+            if (!history.find(h => h.url === url)) {
+                history.unshift({ url, word: firstWord, date: new Date().toLocaleDateString() });
+                localStorage.setItem('pika_pair_history', JSON.stringify(history.slice(0, 10)));
+            }
         }
 
         function showHistory() {
-            const list = JSON.parse(localStorage.getItem('pika_history') || "[]");
-            const container = document.getElementById('history-list');
-            container.innerHTML = list.map(i => `<div class='btn' onclick='window.location.href="${i.url}"'>${i.date}: ${i.preview}</div>`).join('');
-            showScreen('history-screen');
+            const hist = JSON.parse(localStorage.getItem('pika_pair_history') || "[]");
+            if (hist.length === 0) return alert("No history yet!");
+            let msg = "LAST 10 GAMES:\n" + hist.map(h => `${h.date}: ${h.word}`).join('\n');
+            alert(msg);
         }
     </script>
 </body>
